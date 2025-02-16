@@ -1,0 +1,20 @@
+version: v2
+managed:
+  enabled: true
+  override:
+    - file_option: go_package_prefix
+      value: github.com/dora-network/dora-dev-test
+  disable:
+    - module: buf.build/googleapis/googleapis
+      file_option: go_package_prefix
+plugins:
+  - remote: buf.build/protocolbuffers/go:v1.34.1
+    out: .
+    opt: paths=source_relative
+  - remote: buf.build/grpc/go:v1.5.1
+    out: .
+    opt: paths=source_relative
+  - remote: buf.build/grpc-ecosystem/openapiv2:v2.20.0
+    out: docs/openapiv2
+inputs:
+  - directory: proto
