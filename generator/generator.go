@@ -7,6 +7,13 @@ import (
 	"time"
 )
 
+var assetIDs = []string{
+	"BTC-USD",
+	"ETH-USD",
+	"BCH-USD",
+	"ETH-BTC",
+}
+
 func GenerateTick(ctx context.Context, tickCh chan<- data.Tick) {
 	for {
 		select {
@@ -38,7 +45,7 @@ func getTick() data.Tick {
 	}
 
 	return data.Tick{
-		AssetID:   "BTC-USD",
+		AssetID:   assetIDs[rand.Intn(len(assetIDs))],
 		Timestamp: time.Now(),
 		LastPrice: lastPrice,
 		LastSize:  lastSize,

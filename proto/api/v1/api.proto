@@ -31,7 +31,6 @@ message Tick {
   double last_price = 3;
   double last_size = 4;
   double best_bid = 5;
-  double best_ask = 6;
 }
 
 message GetTicksResponse {
