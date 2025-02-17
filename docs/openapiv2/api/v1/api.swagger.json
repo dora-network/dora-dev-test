@@ -87,10 +87,6 @@
         "bestBid": {
           "type": "number",
           "format": "double"
-        },
-        "bestAsk": {
-          "type": "number",
-          "format": "double"
         }
       }
     }
