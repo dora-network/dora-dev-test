@@ -10,11 +10,12 @@ import (
 	"dora-dev-test/redis"
 	"dora-dev-test/service"
 	"fmt"
-	"github.com/twmb/franz-go/pkg/kgo"
-	"google.golang.org/grpc"
 	"log"
 	"net"
 	"os"
+
+	"github.com/twmb/franz-go/pkg/kgo"
+	"google.golang.org/grpc"
 )
 
 const (
@@ -26,6 +27,7 @@ func main() {
 	go generator.GenerateTick(context.Background(), tickCh)
 	client, err := kgo.NewClient(
 		kgo.SeedBrokers("localhost:9092"),
+		kgo.ConsumeTopics("incoming_prices"),
 	)
 	if err != nil {
 		panic(err)
@@ -43,6 +45,6 @@ func main() {
 	var opts []grpc.ServerOption
 
 	grpcServer := grpc.NewServer(opts...)
-	api.RegisterDoraDevTestServiceServer(grpcServer, service.NewService())
+	api.RegisterDoraDevTestServiceServer(grpcServer, service.NewService(ds))
 	log.Fatal(grpcServer.Serve(lis))
 }
