@@ -1,7 +1,9 @@
 package consumer
 
 import (
+	"fmt"
 	"context"
+	"encoding/json"
 	"dora-dev-test/data"
 	"dora-dev-test/datastore"
 	"github.com/twmb/franz-go/pkg/kgo"
@@ -36,6 +38,17 @@ func (c *consumer) start(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		default:
+			fetches := c.client.PollFetches(ctx)
+            fetches.EachRecord(func(record *kgo.Record) {
+				fmt.Println("Seen record")
+				var tick = data.Tick{}
+				err := json.Unmarshal(record.Value, &tick)
+				if err != nil {
+					fmt.Println("error")
+				}
+
+				c.Save(ctx, tick)
+			})
 			// TODO implement me
 			// Consumer should consume messages from the Kafka topic using the Kafka client
 			// and save the tick data to the data store
