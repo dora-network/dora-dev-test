@@ -26,6 +26,7 @@ func main() {
 	go generator.GenerateTick(context.Background(), tickCh)
 	client, err := kgo.NewClient(
 		kgo.SeedBrokers("localhost:9092"),
+		kgo.ConsumeTopics("incoming_prices"),
 	)
 	if err != nil {
 		panic(err)
