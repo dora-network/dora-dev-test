@@ -13,5 +13,5 @@ type DataStore interface {
 	// If to is nil, it will return all ticks until now
 	// If both from and to are nil, it will return all ticks
 	// If limit is greater than 0, it will return at most that many ticks
-	GetTicks(ctx context.Context, assetID string, from, to *int64, limit int) ([]data.Tick, error)
+	GetTicks(ctx context.Context, assetID string) (data.Tick, error)
 }
