@@ -21,7 +21,7 @@ func (s Service) HealthCheck(ctx context.Context, empty *emptypb.Empty) (*api.He
 func (s Service) GetTicks(ctx context.Context, request *api.GetTicksRequest) (*api.GetTicksResponse, error) {
 	tick, err := s.db.GetTicks(ctx, request.Symbol)
 	if err != nil {
-		// handle err
+		//handle err
 	}
 
 	ticks := []*api.Tick{
