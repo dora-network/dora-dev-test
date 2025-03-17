@@ -3,11 +3,14 @@ package service
 import (
 	"context"
 	api "dora-dev-test/api/v1"
+	"dora-dev-test/datastore"
+
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 type Service struct {
 	api.UnimplementedDoraDevTestServiceServer
+	ds datastore.DataStore
 }
 
 func (s Service) HealthCheck(ctx context.Context, empty *emptypb.Empty) (*api.HealthCheckResponse, error) {
@@ -16,10 +19,10 @@ func (s Service) HealthCheck(ctx context.Context, empty *emptypb.Empty) (*api.He
 }
 
 func (s Service) GetTicks(ctx context.Context, request *api.GetTicksRequest) (*api.GetTicksResponse, error) {
-	//TODO implement me
-	panic("implement me")
+	s.ds.GetTicks(ctx, request.Symbol, nil, nil, 0) // dummy values except 1st
+	return nil, nil
 }
 
-func NewService() Service {
-	return Service{}
+func NewService(ds datastore.DataStore) Service {
+	return Service{ds: ds}
 }
