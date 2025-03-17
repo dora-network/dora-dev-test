@@ -4,6 +4,9 @@ import (
 	"context"
 	"dora-dev-test/data"
 	"dora-dev-test/datastore"
+	"encoding/json"
+	"fmt"
+
 	"github.com/twmb/franz-go/pkg/kgo"
 )
 
@@ -31,14 +34,32 @@ func (c *consumer) Start(parent context.Context) {
 }
 
 func (c *consumer) start(ctx context.Context) {
+	fmt.Println("start")
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		default:
-			// TODO implement me
-			// Consumer should consume messages from the Kafka topic using the Kafka client
-			// and save the tick data to the data store
+			fetches := c.client.PollFetches(ctx)
+			if errs := fetches.Errors(); len(errs) > 0 {
+				// All errors are retried internally when fetching, but non-retriable errors are
+				// returned from polls so that users can notice and take action.
+				panic(fmt.Sprint(errs))
+			}
+
+			// We can iterate through a record iterator...
+			iter := fetches.RecordIter()
+			for !iter.Done() {
+				record := iter.Next()
+				tick := data.Tick{}
+
+				err := json.Unmarshal(record.Value, &tick)
+				if err != nil {
+					fmt.Println("Error in JSON unmarshalling from json marshalled object:", err)
+					return
+				}
+				c.ds.SaveTick(ctx, tick)
+			}
 		}
 	}
 }
