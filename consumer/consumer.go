@@ -4,6 +4,9 @@ import (
 	"context"
 	"dora-dev-test/data"
 	"dora-dev-test/datastore"
+	"encoding/json"
+	"fmt"
+
 	"github.com/twmb/franz-go/pkg/kgo"
 )
 
@@ -39,6 +42,19 @@ func (c *consumer) start(ctx context.Context) {
 			// TODO implement me
 			// Consumer should consume messages from the Kafka topic using the Kafka client
 			// and save the tick data to the data store
+			fetches := c.client.PollFetches(ctx)
+			if errs := fetches.Errors(); len(errs) > 0 {
+				panic(fmt.Sprint(errs))
+			}
+
+			iter := fetches.RecordIter()
+			for !iter.Done() {
+				record := iter.Next()
+				fmt.Println(string(record.Value), "from an iterator!")
+				tick := data.Tick{}
+				json.Unmarshal(record.Value, &tick)
+				c.ds.SaveTick(ctx, tick)
+			}
 		}
 	}
 }
