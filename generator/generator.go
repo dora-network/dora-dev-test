@@ -2,9 +2,10 @@ package generator
 
 import (
 	"context"
-	"dora-dev-test/data"
 	"math/rand"
 	"time"
+
+	"dora-dev-test/data"
 )
 
 var assetIDs = []string{
