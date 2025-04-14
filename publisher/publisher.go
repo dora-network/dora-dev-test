@@ -2,8 +2,10 @@ package publisher
 
 import (
 	"context"
-	"dora-dev-test/data"
 	"encoding/json"
+
+	"dora-dev-test/data"
+
 	"github.com/twmb/franz-go/pkg/kgo"
 )
 
