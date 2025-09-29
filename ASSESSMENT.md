@@ -24,6 +24,7 @@ the exception of using AI code generation tools.
 
 ### 1. Tick Consumer and Data Persistence
 
+- Create the database tables for storing ticks and candles.
 - Implement the tick persistence to the Postgres database.
 - Implement the calculation of 1 minute candles from the incoming ticks,
   and store these candles in the same Postgres database.
