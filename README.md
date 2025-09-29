@@ -6,8 +6,7 @@
 To use this project, you will need to have the following installed:
 
 Docker 27.5.0+
-Go 1.22+
-Buf v1.32.1+
+Go 1.25+
 
 ### Docker network
 
@@ -24,9 +23,9 @@ to reflect the new network name.
 
 The test will test your knowledge of the following technologies:
 
-- Kafka
-- Redis
-- Google Cloud Spanner (PostgreSQL Language)
+Go
+PostgreSQL
+HTTP APIs
 
 To start the services, run the following command:
 
@@ -39,3 +38,4 @@ To stop the services, run the following command:
 ```bash
 make compose-down
 ```
+
