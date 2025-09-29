@@ -2,19 +2,18 @@ package main
 
 import (
 	"context"
-	api "dora-dev-test/api/v1"
 	"dora-dev-test/consumer"
 	"dora-dev-test/data"
 	"dora-dev-test/generator"
-	"dora-dev-test/publisher"
-	"dora-dev-test/redis"
+	"dora-dev-test/postgres"
 	"dora-dev-test/service"
 	"fmt"
-	"github.com/twmb/franz-go/pkg/kgo"
-	"google.golang.org/grpc"
 	"log"
-	"net"
+	"net/http"
 	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 )
 
 const (
@@ -22,27 +21,53 @@ const (
 )
 
 func main() {
+	ctx, cancel := context.WithCancel(context.Background())
+	wg := &sync.WaitGroup{}
+
 	tickCh := make(chan data.Tick)
-	go generator.GenerateTick(context.Background(), tickCh)
-	client, err := kgo.NewClient(
-		kgo.SeedBrokers("localhost:9092"),
-	)
-	if err != nil {
-		panic(err)
-	}
-	ds := redis.NewDataStore()
-	con := consumer.NewConsumer(client, ds)
-	con.Start(context.Background())
-	pub := publisher.NewTickPublisher(client, kgo.BasicLogger(os.Stderr, kgo.LogLevelInfo, nil))
-	pub.Start(context.Background(), tickCh, "incoming_prices")
+	wg.Go(func() {
+		generator.GenerateTick(ctx, tickCh)
+	})
 
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", port))
+	ds, err := postgres.NewDataStore()
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		panic(fmt.Sprintf("Failed to connect to data store: %v", err))
 	}
-	var opts []grpc.ServerOption
+	con := consumer.NewConsumer(ds)
+	wg.Go(func() {
+		con.Start(ctx, tickCh)
+	})
 
-	grpcServer := grpc.NewServer(opts...)
-	api.RegisterDoraDevTestServiceServer(grpcServer, service.NewService())
-	log.Fatal(grpcServer.Serve(lis))
+	svc := service.NewService()
+
+	mux := http.NewServeMux()
+	// /ticks/{asset_id}?start={start}&end={end}&limit={limit}
+	mux.HandleFunc("GET /ticks/{asset_id}", svc.GetTicks)
+	// /candles/{asset_id}?start={start}&end={end}&granularity={granularity}&limit={limit}
+	mux.HandleFunc("GET /candles/{asset_id}", svc.GetCandles)
+	// /health
+	mux.HandleFunc("GET /health", svc.HealthCheck)
+
+	server := &http.Server{
+		Addr:    fmt.Sprintf(":%d", port),
+		Handler: mux,
+	}
+
+	go func() {
+		log.Printf("Starting server on port %d", port)
+		log.Fatal(server.ListenAndServe())
+	}()
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	<-sigs
+	cancel()
+	wg.Wait()
+
+	log.Println("Shutting down server...")
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("Server Shutdown Failed:%+v, forcing shutdown", err)
+	}
+
+	log.Println("Graceful shutdown complete.")
 }

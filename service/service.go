@@ -1,25 +1,24 @@
 package service
 
 import (
-	"context"
-	api "dora-dev-test/api/v1"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	"net/http"
 )
 
 type Service struct {
-	api.UnimplementedDoraDevTestServiceServer
-}
-
-func (s Service) HealthCheck(ctx context.Context, empty *emptypb.Empty) (*api.HealthCheckResponse, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (s Service) GetTicks(ctx context.Context, request *api.GetTicksRequest) (*api.GetTicksResponse, error) {
-	//TODO implement me
-	panic("implement me")
 }
 
 func NewService() Service {
 	return Service{}
+}
+
+func (s Service) HealthCheck(w http.ResponseWriter, r *http.Request) {
+	panic("implement me")
+}
+
+func (s Service) GetTicks(w http.ResponseWriter, r *http.Request) {
+	panic("implement me")
+}
+
+func (s Service) GetCandles(w http.ResponseWriter, r *http.Request) {
+	panic("implement me")
 }

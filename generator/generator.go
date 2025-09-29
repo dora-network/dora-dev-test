@@ -2,9 +2,10 @@ package generator
 
 import (
 	"context"
-	"dora-dev-test/data"
 	"math/rand"
 	"time"
+
+	"dora-dev-test/data"
 )
 
 var assetIDs = []string{
@@ -19,7 +20,7 @@ func GenerateTick(ctx context.Context, tickCh chan<- data.Tick) {
 		select {
 		case <-ctx.Done():
 			return
-		case <-time.After(time.Second):
+		case <-time.After(10 * time.Millisecond):
 			tickCh <- getTick()
 		}
 	}
