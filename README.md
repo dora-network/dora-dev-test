@@ -5,8 +5,8 @@
 ### Requirements
 To use this project, you will need to have the following installed:
 
-Docker 27.5.0+
-Go 1.25+
+- Docker 27.5.0+
+- Go 1.25+
 
 ### Docker network
 
@@ -23,9 +23,9 @@ to reflect the new network name.
 
 The test will test your knowledge of the following technologies:
 
-Go
-PostgreSQL
-HTTP APIs
+- Go
+- PostgreSQL
+- HTTP APIs
 
 To start the services, run the following command:
 
