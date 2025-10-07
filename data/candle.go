@@ -11,3 +11,6 @@ type Candle struct {
 	Close          float64   `json:"close"`
 	Volume         float64   `json:"volume"`
 }
+
+// /candles/{asset_id}?start={start}&end={end}&granularity={granularity}&limit={limit}
+// every minute first tick of the asset_id, last tick for the minute
